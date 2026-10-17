@@ -81,7 +81,7 @@ public enum Catalog {
         rule(".gradle/jdks", "JDK unduhan Gradle", "JDK untuk Gradle toolchain. Diunduh ulang bila dibutuhkan.", .android, .costly),
         rule(".android/cache", "Cache Android tools", "Cache sdkmanager/lint. Dibuat ulang.", .android, .regenerable, rec: true, min: 10 * MB),
         rule(".android/avd", "Emulator Android (AVD)",
-             "Image & data emulator. Anda menguji di perangkat asli, jadi emulator umumnya tidak dibutuhkan.", .android, .review),
+             "Image & data emulator. Hapus bila tidak lagi menguji di emulator; bisa dibuat ulang lewat Android Studio › Device Manager.", .android, .review),
         rule("Library/Caches/Google/AndroidStudio*", "Cache Android Studio", "Index & cache IDE. Dibuat ulang saat Studio dibuka.",
              .android, .regenerable, rec: true),
         rule("Library/Logs/Google/AndroidStudio*", "Log Android Studio", "Log IDE lama.", .android, .regenerable, rec: true, min: 10 * MB),

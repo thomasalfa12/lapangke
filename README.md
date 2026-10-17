@@ -1,6 +1,21 @@
-# Lapangke
+<p align="center"><img src="web/public/icon.png" width="128" height="128" alt="Ikon Lapangke"></p>
 
-Pembersih storage macOS untuk semua pengguna Mac, dengan kecerdasan tambahan untuk developer iOS & Android. Native SwiftUI, tanpa dependency, ±3 MB (universal).
+<h1 align="center">Lapangke</h1>
+
+<p align="center"><b>Bikin storage Mac lapang lagi, tanpa takut salah hapus.</b><br>
+<a href="https://lapangke.ourbooth.app">Unduh</a> · macOS 14 Sonoma atau lebih baru · Apple Silicon &amp; Intel · Gratis &amp; open source (MIT)</p>
+
+> **English:** Lapangke is a free, open-source macOS storage cleaner (SwiftUI, no dependencies). It explains what is safe to delete (caches, rarely used apps with their leftovers, forgotten large files) versus what matters, and adds extra smarts for iOS & Android developers (Xcode DerivedData, simulators, unused Gradle/NDK versions, git-ignored build artifacts). Releases are signed with Developer ID and notarized by Apple. The UI and docs are in Indonesian.
+
+Lapangke adalah pembersih storage macOS untuk semua pengguna Mac, dengan kecerdasan tambahan untuk developer iOS & Android. Native SwiftUI, tanpa dependency, ±3 MB (universal).
+
+## Unduh
+
+Versi terbaru ada di **[lapangke.ourbooth.app](https://lapangke.ourbooth.app)** atau di halaman [Releases](https://github.com/thomasalfa12/lapangke/releases). DMG ditandatangani Developer ID dan dinotarisasi Apple, jadi macOS membukanya tanpa peringatan.
+
+Setelah dipasang: System Settings › Privacy & Security › **Full Disk Access** › tambahkan Lapangke. Tanpa izin ini, Tong Sampah, Containers, dan media WhatsApp/Telegram tidak terlihat.
+
+## Fitur
 
 Untuk semua pengguna:
 - **App jarang dipakai**: kapan terakhir dibuka (Spotlight) + kapan datanya terakhir berubah + apakah sedang berjalan. App disarankan dihapus beserta sisa datanya (Application Support, Caches, Containers, Group Containers, Saved State, data web, log), dan setiap lokasi bisa dicentang satu per satu.
@@ -38,29 +53,32 @@ Setiap aksi divalidasi ulang oleh `SafetyGuard` tepat sebelum dieksekusi:
 - **Pindah ke SSD**: salin dengan `ditto`, verifikasi jumlah & ukuran file, baru hapus asalnya. Lokasi lama bisa diganti symlink. Ada manifest di SSD (`Lapangke Offload/manifest.json`), dan bisa dikembalikan.
 - **Cache dev langsung ke SSD**: DerivedData (pengaturan Xcode), `GRADLE_USER_HOME` dan cache npm (blok terkelola di `~/.zshenv` yang hanya aktif bila SSD terpasang). Folder memakai akhiran `.noindex` dan dikecualikan dari Time Machine.
 
-## Build & pasang (Mac ini)
+## Build dari source
+
+Butuh Swift 6 (Xcode 16 ke atas); dibangun & diuji dengan Xcode 27.
 
 ```bash
-cd ~/builder/lapangke
-scripts/build-app.sh --install   # build universal, sign Apple Development, salin ke /Applications
+git clone https://github.com/thomasalfa12/lapangke.git
+cd lapangke
 swift test                       # 26 test: pengaman, klasifikasi, app & sisa data, file besar, offload, ~/.zshenv
+scripts/build-app.sh --install   # build universal, sign (Apple Development bila ada, selain itu ad-hoc), salin ke /Applications
 ```
 
-## Rilis publik
+Bila `xcode-select` menunjuk CommandLineTools, skrip memakai `/Applications/Xcode.app` lewat `DEVELOPER_DIR`.
+Untuk memeriksa UI tanpa izin Screen Recording: `LAPANGKE_SNAPSHOT_LIGHT=1 LAPANGKE_SNAPSHOT_DIR=/tmp/shots .build/debug/Lapangke` merender tiap halaman ke PNG (hanya build debug).
 
-Halaman unduh: **https://lapangke.ourbooth.app** (Cloudflare Workers static assets, sumber `web/`).
-File: `https://downloads.ourbooth.app/lapangke/Lapangke-<versi>.dmg` (R2 `ourbooth-printer-studio`, prefix `lapangke/`).
-Keduanya di domain `ourbooth.app`; `r2.dev`, `workers.dev`, dan banyak `pages.dev` diblokir sebagian ISP Indonesia (TrustPositif).
+## Rilis (maintainer)
+
+Situs: **https://lapangke.ourbooth.app** (Cloudflare Workers static assets, sumber `web/`). File: `<LAPANGKE_PUBLIC_BASE>/lapangke/Lapangke-<versi>.dmg` di R2. Situs & file sengaja memakai domain sendiri: `r2.dev`, `workers.dev`, dan banyak `pages.dev` diblokir sebagian ISP Indonesia.
 
 ```bash
 # naikkan CFBundleShortVersionString + CFBundleVersion di Resources/Info.plist dulu
-scripts/release.sh --upload      # Developer ID (Xcode, cloud-managed) → notarisasi Apple → DMG → cek Gatekeeper → R2 → website
+scripts/release.sh --upload      # Developer ID lewat Xcode → notarisasi Apple → DMG → cek Gatekeeper → R2 → website
+scripts/release.sh --upload-only # unggah DMG yang sudah ada di build/release tanpa notarisasi ulang
 scripts/publish-web.sh           # hanya render + deploy website dari build/release/latest.json
 ```
 
-Syarat: Xcode › Settings › Accounts login sebagai Account Holder tim 4KSYSZU72C. Notarisasi biasanya 5–10 menit.
-
-Setelah dipasang: System Settings › Privacy & Security › **Full Disk Access** › tambahkan Lapangke. Tanpa izin ini, Tong Sampah, Containers, dan media WhatsApp/Telegram tidak terlihat.
+Syarat: Xcode › Settings › Accounts login sebagai Account Holder tim Apple Developer. Konfigurasi lewat env: `LAPANGKE_TEAM_ID`, `LAPANGKE_R2_BUCKET`, `LAPANGKE_PUBLIC_BASE`, `LAPANGKE_SITE` (bawaannya infrastruktur rilis resmi). Notarisasi biasanya 5–10 menit.
 
 ## Terminal (read-only)
 
@@ -72,3 +90,11 @@ Setelah dipasang: System Settings › Privacy & Security › **Full Disk Access*
 ```
 
 Mode terminal tidak pernah menghapus apa pun.
+
+## Kontribusi
+
+Issue dan pull request dipersilakan. Aturan utamanya: setiap jenis data baru wajib punya label keamanan yang jujur, dan apa pun yang dihapus harus lolos `SafetyGuard`. Tambahkan test untuk aturan baru (`swift test`).
+
+## Lisensi
+
+Kode: [MIT](LICENSE) © 2026 Thomas Edison. Font Outfit di `web/public/fonts`: [SIL Open Font License 1.1](web/public/fonts/OFL.txt), © The Outfit Project Authors.

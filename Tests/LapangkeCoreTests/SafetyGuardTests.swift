@@ -50,7 +50,7 @@ struct Sandbox {
         let box = try Sandbox()
         defer { box.cleanup() }
         let guardrail = SafetyGuard(home: box.home)
-        for relative in ["builder/app/ourbooth-release.jks", "builder/app/release.keystore", "builder/web/.env.local",
+        for relative in ["builder/app/app-release.jks", "builder/app/release.keystore", "builder/web/.env.local",
                          ".ssh/id_ed25519", "Library/Keychains/login.keychain-db", ".claude/projects/x/memory/a.md",
                          "Library/Mobile Documents/com~apple~CloudDocs/a.txt"] {
             let url = try box.make(relative)

@@ -238,7 +238,7 @@ public enum InstalledApps {
         "com.google.antigravity", "com.anthropic.", "com.openai.", "com.docker.", "com.postmanlabs.", "com.figma.",
         "com.github.", "com.googlecode.iterm2", "dev.warp.", "com.mitchellh.ghostty", "com.proxyman.", "com.charlesproxy.",
         "com.tinyapp.TablePlus", "com.cloudflare.", "com.google.Chrome", "com.brave.", "org.mozilla.firefox",
-        "com.google.drivefs", "com.thomasalfa.", "space.ourbooth.", "app.ourbooth.", "id.thomasalfa.",
+        "com.google.drivefs", "id.thomasalfa.lapangke",
         "com.sublimetext.", "com.panic.", "com.raycast.", "com.1password.", "com.bitwarden.", "com.microsoft.Word",
         "com.microsoft.Excel", "com.microsoft.Powerpoint", "com.apple.iWork.", "com.adobe.", "com.canva.", "com.notion.",
     ]
@@ -255,7 +255,7 @@ public enum InstalledApps {
     static func classify(name: String, bundleID: String?, category: String?, path: String) -> (AppRole, String) {
         let id = bundleID ?? ""
         let lowerName = name.lowercased()
-        if workIDs.contains(where: { id.hasPrefix($0) }) || lowerName.contains("ourbooth") {
+        if workIDs.contains(where: { id.hasPrefix($0) }) {
             return (.work, "Tool kerja")
         }
         if communicationIDs.contains(where: { id.hasPrefix($0) }) { return (.communication, "App komunikasi") }

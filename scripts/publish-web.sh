@@ -4,6 +4,7 @@
 #   scripts/publish-web.sh --render-only  → hanya tulis web/public/index.html
 set -euo pipefail
 cd "$(dirname "$0")/.."
+SITE="${LAPANGKE_SITE:-https://lapangke.ourbooth.app}"
 
 /usr/bin/python3 -I - web/index.template.html build/release/latest.json web/public/index.html <<'PY'
 import datetime, json, sys
@@ -29,5 +30,5 @@ PY
 
 [ "${1:-}" = "--render-only" ] && exit 0
 cd web && npx --yes wrangler@4 deploy
-code="$(curl -s -o /dev/null -w "%{http_code}" https://lapangke.ourbooth.app/ || true)"
-if [ "$code" = "200" ]; then echo "✓ https://lapangke.ourbooth.app → HTTP 200"; else echo "Domain baru: tunggu 1–2 menit untuk DNS & sertifikat, lalu cek lagi (HTTP $code)."; fi
+code="$(curl -s -o /dev/null -w "%{http_code}" "$SITE/" || true)"
+if [ "$code" = "200" ]; then echo "✓ $SITE → HTTP 200"; else echo "Domain baru: tunggu 1–2 menit untuk DNS & sertifikat, lalu cek lagi (HTTP $code)."; fi

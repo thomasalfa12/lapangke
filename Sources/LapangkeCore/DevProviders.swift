@@ -272,11 +272,11 @@ public struct AndroidSDKProvider: ItemProvider {
             candidates.append((source, "Source Android (\(source.lastPathComponent))", "Hanya untuk navigasi kode di IDE; tidak dibutuhkan untuk build.", .regenerable, true, .delete))
         }
         for image in PathTools.children(of: sdk.appendingPathComponent("system-images")) where PathTools.isDirectory(image.path) {
-            candidates.append((image, "System image emulator (\(image.lastPathComponent))", "Image emulator. Anda menguji di perangkat asli.", .review, false, .trash))
+            candidates.append((image, "System image emulator (\(image.lastPathComponent))", "Image emulator. Hapus bila tidak lagi memakai emulator; diunduh ulang lewat sdkmanager.", .review, false, .trash))
         }
         let emulator = sdk.appendingPathComponent("emulator")
         if PathTools.isDirectory(emulator.path) {
-            candidates.append((emulator, "Android Emulator", "Program emulator. Tidak dibutuhkan bila selalu uji di perangkat asli.", .costly, false, .delete))
+            candidates.append((emulator, "Android Emulator", "Program emulator. Tidak dibutuhkan bila Anda selalu menguji di perangkat asli.", .costly, false, .delete))
         }
 
         let sizes = await SizeCalculator.measureAll(candidates.map(\.0))

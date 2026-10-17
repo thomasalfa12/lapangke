@@ -4,18 +4,23 @@
 #   scripts/release.sh --upload        → juga unggah ke R2 (downloads.ourbooth.app/lapangke/…) + deploy website
 #   scripts/release.sh --upload-only   → unggah DMG yang sudah ada di build/release (tanpa notarisasi ulang)
 #
-# Tanpa sertifikat Developer ID di keychain: tim 4KSYSZU72C memakai sertifikat cloud-managed, jadi
+# Tanpa sertifikat Developer ID di keychain: tim dengan sertifikat cloud-managed bisa dipakai, karena
 # .app dibungkus .xcarchive lalu diekspor `xcodebuild -exportArchive` (method developer-id,
 # destination upload = langsung ke notary Apple) dan diambil kembali dengan `-exportNotarizedApp`.
-# Syarat: Xcode › Settings › Accounts login sebagai Account Holder tim.
+# Syarat: Xcode › Settings › Accounts login sebagai Account Holder tim (LAPANGKE_TEAM_ID).
+#
+# Variabel (bawaan = infrastruktur rilis resmi lapangke.ourbooth.app):
+#   LAPANGKE_TEAM_ID      Team ID Apple Developer
+#   LAPANGKE_R2_BUCKET    bucket R2 tujuan unggah
+#   LAPANGKE_PUBLIC_BASE  URL publik bucket (tanpa prefix)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
 
-TEAM="4KSYSZU72C"
-BUCKET="ourbooth-printer-studio"
+TEAM="${LAPANGKE_TEAM_ID:-4KSYSZU72C}"
+BUCKET="${LAPANGKE_R2_BUCKET:-ourbooth-printer-studio}"
 PREFIX="lapangke"
-PUBLIC="https://downloads.ourbooth.app/$PREFIX"
+PUBLIC="${LAPANGKE_PUBLIC_BASE:-https://downloads.ourbooth.app}/$PREFIX"
 APP_NAME="Lapangke.app"
 VERSION="$(plutil -extract CFBundleShortVersionString raw Resources/Info.plist)"
 BUNDLE_ID="$(plutil -extract CFBundleIdentifier raw Resources/Info.plist)"
