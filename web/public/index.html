@@ -78,6 +78,9 @@ h1 .accent { color: var(--accent-ink); }
 .text-link:hover { text-decoration-color: var(--ink); }
 .meta { margin: 18px 0 0; font-size: 14px; color: var(--ink-3); }
 .meta b { color: var(--ink); font-weight: 600; }
+.meta a { color: var(--ink-2); text-decoration: underline; text-decoration-color: rgb(8 46 82 / .3); text-underline-offset: 3px; }
+.meta a:hover { color: var(--ink); text-decoration-color: var(--ink); }
+.meta-alt { margin-top: 6px; }
 .trust-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .trust-chip { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); padding: 7px 14px 7px 9px; background: #fff; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; font-weight: 550; }
 .trust-chip i { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--lime-2); color: #304313; }
@@ -272,7 +275,7 @@ footer a { color: var(--ink-2); }
       <a href="#aman">Kenapa aman</a>
       <a href="#kebutuhan">Kebutuhan</a>
       <a href="https://github.com/thomasalfa12/lapangke">GitHub</a>
-      <a class="pill" href="https://github.com/thomasalfa12/lapangke/releases/download/v1.3.0/Lapangke-1.3.0.dmg">Unduh</a>
+      <a class="pill" href="Lapangke-1.3.0.dmg" download>Unduh</a>
     </nav>
   </div>
 </header>
@@ -285,10 +288,11 @@ footer a { color: var(--ink-2); }
         <h1 id="judul">Mac penuh? <span class="accent">Bikin lapang</span> lagi.</h1>
         <p class="lead">Lapangke memeriksa isi Mac Anda, lalu memisahkan yang aman dihapus (cache, app yang jarang dibuka, file besar yang terlupa) dari yang penting. Bersih dalam beberapa klik, tanpa takut salah hapus.</p>
         <div class="cta-row">
-          <a class="btn" href="https://github.com/thomasalfa12/lapangke/releases/download/v1.3.0/Lapangke-1.3.0.dmg"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh untuk Mac</a>
+          <a class="btn" href="Lapangke-1.3.0.dmg" download><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh untuk Mac</a>
           <a class="text-link" href="#cara">Cara pasang</a>
         </div>
         <p class="meta"><b>Butuh macOS 14 Sonoma atau lebih baru</b> · Apple Silicon &amp; Intel · Versi 1.3.0 · 2,8 MB</p>
+        <p class="meta meta-alt">Unduhan tidak mulai? <a href="https://github.com/thomasalfa12/lapangke/releases/download/v1.3.0/Lapangke-1.3.0.dmg">Ambil dari GitHub Releases</a>, file yang sama.</p>
         <div class="trust-row">
           <span class="trust-chip"><i><svg aria-hidden="true"><use href="#i-check"/></svg></i>Ditandatangani &amp; dinotarisasi Apple</span>
           <a class="trust-chip" href="https://github.com/thomasalfa12/lapangke"><i class="gh"><svg aria-hidden="true"><use href="#i-github"/></svg></i>Open source · MIT</a>
@@ -424,8 +428,8 @@ footer a { color: var(--ink-2); }
     <div class="final">
       <div class="art"><svg class="flower"><use href="#flower"/></svg><span class="orbit"></span></div>
       <h2 id="ajak">Mac lapang, kerja tenang.</h2>
-      <a class="btn" href="https://github.com/thomasalfa12/lapangke/releases/download/v1.3.0/Lapangke-1.3.0.dmg"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh Lapangke · 2,8 MB</a>
-      <p class="meta">Gratis &amp; open source · Butuh macOS 14 Sonoma atau lebih baru · <a href="https://github.com/thomasalfa12/lapangke">Lihat kode di GitHub</a></p>
+      <a class="btn" href="Lapangke-1.3.0.dmg" download><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh Lapangke · 2,8 MB</a>
+      <p class="meta">Gratis &amp; open source · Butuh macOS 14 Sonoma atau lebih baru · Cadangan: <a href="https://github.com/thomasalfa12/lapangke/releases/download/v1.3.0/Lapangke-1.3.0.dmg">GitHub Releases</a></p>
     </div>
   </section>
 </main>

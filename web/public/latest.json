@@ -1,0 +1,12 @@
+{
+  "version": "1.3.0",
+  "releasedAt": "2026-10-18T02:13:55Z",
+  "minimumMacOS": "14.0",
+  "file": "Lapangke-1.3.0.dmg",
+  "sizeBytes": 2758189,
+  "sha256": "933a5ee1e610450f83b628b857eab4bcad2a1e11226864987636dd67066a64a3",
+  "url": "https://thomasalfa12.github.io/lapangke/Lapangke-1.3.0.dmg",
+  "mirrors": [
+    "https://github.com/thomasalfa12/lapangke/releases/download/v1.3.0/Lapangke-1.3.0.dmg"
+  ]
+}

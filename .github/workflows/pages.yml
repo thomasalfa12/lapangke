@@ -24,6 +24,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      # DMG ikut disajikan dari situs (tombol utama), diambil dari GitHub Release
+      # dan harus cocok dengan SHA-256 di latest.json; bila tidak, deploy batal.
+      - name: Sertakan DMG rilis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(jq -r .version web/public/latest.json)
+          file=$(jq -r .file web/public/latest.json)
+          gh release download "v$version" --repo "$GITHUB_REPOSITORY" --pattern "$file" --dir web/public
+          echo "$(jq -r .sha256 web/public/latest.json)  web/public/$file" | sha256sum -c -
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
