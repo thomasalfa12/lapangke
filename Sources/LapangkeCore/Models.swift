@@ -214,6 +214,7 @@ public extension Int64 {
     var memoryText: String { format(style: .memory) }
 
     private func format(style: ByteCountFormatter.CountStyle) -> String {
+        if self == 0 { return "0 MB" }
         let formatter = ByteCountFormatter()
         formatter.countStyle = style
         formatter.allowsNonnumericFormatting = false

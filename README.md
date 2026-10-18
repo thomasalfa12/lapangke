@@ -21,7 +21,11 @@ Untuk semua pengguna:
 - **App jarang dipakai**: kapan terakhir dibuka (Spotlight) + kapan datanya terakhir berubah + apakah sedang berjalan. App disarankan dihapus beserta sisa datanya (Application Support, Caches, Containers, Group Containers, Saved State, data web, log), dan setiap lokasi bisa dicentang satu per satu.
 - **File besar** (≥300 MB) per file: video, image disk, arsip, VM, RAW, file desain, di semua folder pribadi.
 - **Cache & sisa sistem**: cache browser/app, log, installer di Unduhan, Tong Sampah, sisa app yang sudah dihapus.
-- **Peta storage** per folder, dan **SSD eksternal** (pindah + verifikasi + kembalikan).
+- **Peta storage** berupa treemap interaktif: arahkan kursor untuk detail (ukuran, % folder & disk, folder terkunci), klik untuk masuk.
+- **Pulau Lapangke**: kapsul ala Dynamic Island di tengah atas layar yang muncul hanya saat penting (ruang menipis, ruang turun drastis beserta penyebabnya, SSD dicolok, progres pembersihan live) — plus **notifikasi pintar** dengan tombol aksi dan ikon menu bar berupa cincin pengukur.
+- **Penghapusan dengan progres nyata** per byte (bukan per item), bisa dihentikan setelah item berjalan.
+- **Panduan izin** dengan deteksi langsung: seret ikon ke daftar Full Disk Access, izin notifikasi, buka saat login.
+- **SSD eksternal** (pindah + verifikasi + kembalikan).
 
 Untuk developer (otomatis muncul bila tool-nya ada): DerivedData, simulator via `simctl`, DeviceSupport, Gradle/NDK/SDK versi tak terpakai, artefak proyek dari `git ls-files --ignored`, toolchain, ekstensi editor lama, riwayat sesi AI.
 
@@ -60,7 +64,7 @@ Butuh Swift 6 (Xcode 16 ke atas); dibangun & diuji dengan Xcode 27.
 ```bash
 git clone https://github.com/thomasalfa12/lapangke.git
 cd lapangke
-swift test                       # 26 test: pengaman, klasifikasi, app & sisa data, file besar, offload, ~/.zshenv
+swift test                       # 30 test: pengaman, klasifikasi, app & sisa data, file besar, penghapusan berprogres, treemap, offload
 scripts/build-app.sh --install   # build universal, sign (Apple Development bila ada, selain itu ad-hoc), salin ke /Applications
 ```
 

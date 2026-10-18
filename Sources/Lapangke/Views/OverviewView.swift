@@ -83,8 +83,11 @@ struct OverviewView: View {
                     Text("Beri Lapangke akses penuh ke disk").font(.headline).foregroundStyle(Brand.ink)
                     Text("Tanpa Full Disk Access, Tong Sampah, Containers, dan media WhatsApp/Telegram tidak terlihat (bisa puluhan GB). Klik tombol di bawah, lalu seret Lapangke dari Finder ke daftar Full Disk Access dan nyalakan.")
                         .font(.callout).foregroundStyle(Brand.ink2)
-                    Button("Buka pengaturan Full Disk Access") { model.openFullDiskAccessSettings() }
-                        .buttonStyle(PillButtonStyle(background: Brand.ink))
+                    HStack {
+                        Button("Panduan izin") { model.showOnboarding = true }
+                            .buttonStyle(PillButtonStyle(background: Brand.ink))
+                        Button("Buka pengaturan Full Disk Access") { model.openFullDiskAccessSettings() }
+                    }
                 }
             }
         }

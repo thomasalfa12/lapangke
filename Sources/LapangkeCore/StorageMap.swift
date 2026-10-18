@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 public struct MapNode: Codable, Sendable, Identifiable, Hashable {
@@ -46,9 +47,17 @@ public enum StorageMapper {
         var children: [String: Bucket] = [:]
     }
 
+    static let maxDepth = 3
+
     static func mapTree(_ root: URL) -> MapNode {
         let rootPath = root.standardizedFileURL.path
         let base = rootPath == "/" ? "/" : rootPath + "/"
+        // realpath(), bukan resolvingSymlinksInPath(): yang terakhir justru membuang awalan /private.
+        let resolvedRoot = realpath(rootPath, nil).map { pointer in
+            defer { free(pointer) }
+            return String(cString: pointer)
+        } ?? rootPath
+        let resolvedBase = resolvedRoot == "/" ? "/" : resolvedRoot + "/"
         let top = Bucket()
         let mounts = Set(MountTable.mountPoints(inside: rootPath).filter { $0 != rootPath })
         let keys: [URLResourceKey] = [.isDirectoryKey, .isVolumeKey, .totalFileAllocatedSizeKey, .fileAllocatedSizeKey]
@@ -63,16 +72,24 @@ public enum StorageMapper {
             return MapNode(name: root.lastPathComponent, path: rootPath, bytes: 0, unreadable: 1, children: nil)
         }
 
-        func buckets(for path: String) -> (Bucket, Bucket?) {
-            let relative = path.hasPrefix(base) ? path.dropFirst(base.count) : Substring(path)
-            let parts = relative.split(separator: "/", maxSplits: 2, omittingEmptySubsequences: true)
-            guard let first = parts.first else { return (top, nil) }
-            let level1 = top.children[String(first), default: Bucket()]
-            top.children[String(first)] = level1
-            guard parts.count >= 3 else { return (level1, nil) }
-            let level2 = level1.children[String(parts[1]), default: Bucket()]
-            level1.children[String(parts[1])] = level2
-            return (level1, level2)
+        /// Rantai bucket level 1…maxDepth untuk sebuah path (folder induk dari file).
+        func chain(for path: String) -> [Bucket] {
+            // Enumerator bisa mengembalikan path ter-resolve (/var → /private/var); cocokkan keduanya.
+            let prefix = [base, resolvedBase].first { path.hasPrefix($0) }
+            let relative = prefix.map { path.dropFirst($0.count) } ?? Substring(path)
+            let parts = relative.split(separator: "/", omittingEmptySubsequences: true)
+            var result: [Bucket] = []
+            var current = top
+            // Komponen terakhir adalah file itu sendiri; hanya folder induknya yang jadi bucket (kecuali level 1).
+            for (index, part) in parts.prefix(maxDepth).enumerated() {
+                if index > 0, index == parts.count - 1 { break }
+                let key = String(part)
+                let next = current.children[key, default: Bucket()]
+                current.children[key] = next
+                result.append(next)
+                current = next
+            }
+            return result
         }
 
         for case let url as URL in enumerator {
@@ -82,22 +99,18 @@ public enum StorageMapper {
                 continue
             }
             let size = Int64(values.totalFileAllocatedSize ?? values.fileAllocatedSize ?? 0)
-            let (level1, level2) = buckets(for: url.path)
             top.bytes += size
-            if level1 !== top { level1.bytes += size }
-            level2?.bytes += size
+            for bucket in chain(for: url.path) { bucket.bytes += size }
         }
         for path in errors.failedPaths {
-            let (level1, level2) = buckets(for: path + "/x")
             top.unreadable += 1
-            if level1 !== top { level1.unreadable += 1 }
-            level2?.unreadable += 1
+            for bucket in chain(for: path + "/x") { bucket.unreadable += 1 }
         }
 
         func node(_ name: String, _ path: String, _ bucket: Bucket, depth: Int) -> MapNode {
-            let kids: [MapNode]? = depth >= 2 || bucket.children.isEmpty ? nil : bucket.children
+            let kids: [MapNode]? = depth >= maxDepth || bucket.children.isEmpty ? nil : bucket.children
                 .map { node($0.key, path == "/" ? "/\($0.key)" : "\(path)/\($0.key)", $0.value, depth: depth + 1) }
-                .filter { $0.bytes >= 10 * MB || $0.unreadable > 0 }
+                .filter { $0.bytes >= 5 * MB || $0.unreadable > 0 }
                 .sorted { $0.bytes > $1.bytes }
             return MapNode(name: name, path: path, bytes: bucket.bytes, unreadable: bucket.unreadable, children: kids)
         }

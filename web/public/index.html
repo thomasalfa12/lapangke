@@ -132,6 +132,27 @@ h2 { font-size: clamp(2rem, 3.6vw, 3.1rem); line-height: 1.06; letter-spacing: -
 .c-dev .chip { background: #fff; }
 .card .flower { width: 46%; right: -14%; top: -18%; color: #ffffff; opacity: .55; }
 
+/* Pulau Lapangke */
+.c-island { grid-column: 1 / -1; background: #0b1621; color: #fff; display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; border-radius: 36px 36px 36px 10px; }
+.c-island h3 { color: #fff; }
+.c-island p { color: #b9c3cc; }
+.c-island .icon { background: #ffffff1f; color: #7fd0f5; }
+.island-demo { display: grid; justify-items: center; gap: 14px; padding: 8px 0; }
+.isle { display: inline-flex; align-items: center; gap: 10px; background: #000; border: 1px solid #ffffff1a; border-radius: 999px; padding: 8px 10px 8px 10px; font-size: 14px; box-shadow: 0 18px 40px -18px #000; }
+.isle b { font-weight: 650; }
+.isle-chip { font-size: 12px; font-weight: 700; background: #ffffff24; border-radius: 999px; padding: 4px 10px; }
+.isle .ring { width: 20px; height: 20px; border-radius: 50%; background: conic-gradient(#ff7a66 0 94%, #ffffff2e 94% 100%); -webkit-mask: radial-gradient(circle, transparent 6px, #000 6.5px); mask: radial-gradient(circle, transparent 6px, #000 6.5px); flex: none; }
+.isle-card { display: grid; gap: 10px; border-radius: 26px; padding: 14px 16px; width: min(100%, 360px); }
+.isle-row { display: flex; align-items: center; gap: 12px; }
+.isle-row small { display: block; font-size: 12px; color: #ffffff99; }
+.isle-row .isle-count { margin-left: auto; }
+.isle .ring-live { width: 32px; height: 32px; display: grid; place-items: center; background: conic-gradient(#4fd7f8 0 46%, #ffffff24 46% 100%); -webkit-mask: none; mask: none; position: relative; }
+.isle .ring-live::before { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: #000; }
+.isle .ring-live em { position: relative; font-style: normal; font-size: 10px; font-weight: 700; }
+.isle-bar { height: 6px; border-radius: 999px; background: #ffffff24; overflow: hidden; }
+.isle-bar i { display: block; height: 100%; width: 46%; border-radius: 999px; background: linear-gradient(90deg, #4fd7f8, #1f8cf0); }
+.burst { width: 22px; height: 22px; background: #fff; flex: none; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M60 8C74-8 87 2 86 20C108 9 121 26 107 42C130 46 131 67 110 73C123 92 108 109 89 100C90 123 68 131 60 110C47 132 26 120 31 101C10 111-3 94 11 76C-11 68-6 47 14 43C-1 24 16 9 35 21C32 1 51-8 60 8Z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M60 8C74-8 87 2 86 20C108 9 121 26 107 42C130 46 131 67 110 73C123 92 108 109 89 100C90 123 68 131 60 110C47 132 26 120 31 101C10 111-3 94 11 76C-11 68-6 47 14 43C-1 24 16 9 35 21C32 1 51-8 60 8Z'/%3E%3C/svg%3E") center / contain no-repeat; }
+
 /* Aman */
 .safe { background: var(--stage); color: #fff; border-radius: 90px 36px 90px 36px; padding: 72px 64px; overflow: hidden; }
 .safe .art .flower { color: #0d4a7c; opacity: .9; width: 34%; right: -6%; top: -16%; }
@@ -209,6 +230,7 @@ footer a { color: var(--ink-2); }
   .freed b { font-size: 22px; }
   .section { padding: 64px 0; }
   .bento { grid-template-columns: 1fr; }
+  .c-island { grid-template-columns: 1fr; }
   .card { padding: 26px; min-height: 0; border-radius: 30px; }
   .c-files { border-radius: 44px 22px 44px 22px; }
   .c-dev { flex-wrap: wrap; } .c-dev .chips { margin: 0; justify-content: flex-start; }
@@ -248,7 +270,7 @@ footer a { color: var(--ink-2); }
       <a href="#aman">Kenapa aman</a>
       <a href="#kebutuhan">Kebutuhan</a>
       <a href="https://github.com/thomasalfa12/lapangke">GitHub</a>
-      <a class="pill" href="https://downloads.ourbooth.app/lapangke/Lapangke-1.2.0.dmg">Unduh</a>
+      <a class="pill" href="https://downloads.ourbooth.app/lapangke/Lapangke-1.3.0.dmg">Unduh</a>
     </nav>
   </div>
 </header>
@@ -261,10 +283,10 @@ footer a { color: var(--ink-2); }
         <h1 id="judul">Mac penuh? <span class="accent">Bikin lapang</span> lagi.</h1>
         <p class="lead">Lapangke memeriksa isi Mac Anda, lalu memisahkan yang aman dihapus (cache, app yang jarang dibuka, file besar yang terlupa) dari yang penting. Bersih dalam beberapa klik, tanpa takut salah hapus.</p>
         <div class="cta-row">
-          <a class="btn" href="https://downloads.ourbooth.app/lapangke/Lapangke-1.2.0.dmg"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh untuk Mac</a>
+          <a class="btn" href="https://downloads.ourbooth.app/lapangke/Lapangke-1.3.0.dmg"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh untuk Mac</a>
           <a class="text-link" href="#cara">Cara pasang</a>
         </div>
-        <p class="meta"><b>Butuh macOS 14 Sonoma atau lebih baru</b> · Apple Silicon &amp; Intel · Versi 1.2.0 · 2,3 MB</p>
+        <p class="meta"><b>Butuh macOS 14 Sonoma atau lebih baru</b> · Apple Silicon &amp; Intel · Versi 1.3.0 · 2,8 MB</p>
         <div class="trust-row">
           <span class="trust-chip"><i><svg aria-hidden="true"><use href="#i-check"/></svg></i>Ditandatangani &amp; dinotarisasi Apple</span>
           <a class="trust-chip" href="https://github.com/thomasalfa12/lapangke"><i class="gh"><svg aria-hidden="true"><use href="#i-github"/></svg></i>Open source · MIT</a>
@@ -324,6 +346,21 @@ footer a { color: var(--ink-2); }
           <p>Yang masih ingin disimpan dipindah ke SSD, diverifikasi dulu, dan bisa dikembalikan kapan saja. Cocok untuk Mac 256 GB.</p>
           <div class="chips"><span class="chip">Cek format &amp; kecepatan</span><span class="chip">Salin + verifikasi</span><span class="chip">Kembalikan 1 klik</span></div>
         </article>
+        <article class="card c-island">
+          <div class="island-demo" aria-hidden="true">
+            <div class="isle"><span class="ring"></span><b>Sisa 9,3 GB</b><span class="isle-chip">Bersihkan 10 GB</span></div>
+            <div class="isle isle-card">
+              <div class="isle-row"><span class="ring ring-live"><em>46</em></span><span><b>Menghapus…</b><small>4,7 GB dari 10,1 GB</small></span><small class="isle-count">7/39</small></div>
+              <span class="isle-bar"><i></i></span>
+            </div>
+            <div class="isle"><span class="burst"></span><b>+10,1 GB lega</b></div>
+          </div>
+          <div class="island-copy">
+            <div class="icon"><svg aria-hidden="true"><use href="#i-sparkles"/></svg></div>
+            <h3>Pulau Lapangke</h3>
+            <p>Kapsul kecil di tengah atas layar yang muncul hanya saat penting: ruang menipis, ruang turun drastis lengkap dengan penyebabnya, SSD dicolok, dan progres pembersihan live. Ditambah notifikasi dengan tombol aksi.</p>
+          </div>
+        </article>
         <article class="card c-dev">
           <div class="icon"><svg aria-hidden="true"><use href="#i-code"/></svg></div>
           <div>
@@ -349,7 +386,7 @@ footer a { color: var(--ink-2); }
       <div class="facts">
         <span>Developer ID: <b>Thomas Edison (4KSYSZU72C)</b></span>
         <span>Dirilis <b>18 Oktober 2026</b></span>
-        <span>SHA-256 <code>2926a544a4be15f383a3498d6f27a95545eac1ca26f7dc904d92e4dd62dbd19c</code></span>
+        <span>SHA-256 <code>933a5ee1e610450f83b628b857eab4bcad2a1e11226864987636dd67066a64a3</code></span>
         <a class="fact-link" href="https://github.com/thomasalfa12/lapangke">Kode sumber terbuka di GitHub · MIT →</a>
       </div>
     </div>
@@ -360,7 +397,7 @@ footer a { color: var(--ink-2); }
       <p class="label">Cara pasang</p>
       <h2 id="cara-judul">Tiga langkah, selesai.</h2>
       <div class="steps">
-        <div class="step"><span>1</span><div><b>Unduh &amp; buka DMG</b><p>Klik dua kali Lapangke-1.2.0.dmg.</p></div></div>
+        <div class="step"><span>1</span><div><b>Unduh &amp; buka DMG</b><p>Klik dua kali Lapangke-1.3.0.dmg.</p></div></div>
         <div class="step"><span>2</span><div><b>Seret ke Applications</b><p>Lalu buka Lapangke dari Launchpad.</p></div></div>
         <div class="step"><span>3</span><div><b>Beri akses disk</b><p>Agar semua folder terbaca. Tombolnya ada di layar pertama.</p></div></div>
       </div>
@@ -374,7 +411,7 @@ footer a { color: var(--ink-2); }
         <dl>
           <div><dt>macOS</dt><dd>14 Sonoma atau lebih baru<small>macOS 13 Ventura ke bawah belum didukung. Diuji di macOS 27.</small></dd></div>
           <div><dt>Mac</dt><dd>Apple Silicon (M1 ke atas) atau Intel<small>Satu file universal untuk keduanya.</small></dd></div>
-          <div><dt>Ruang</dt><dd>±10 MB<small>Unduhan 2,3 MB.</small></dd></div>
+          <div><dt>Ruang</dt><dd>±10 MB<small>Unduhan 2,8 MB.</small></dd></div>
           <div><dt>Izin</dt><dd>Full Disk Access (disarankan)<small>Agar semua folder bisa diukur.</small></dd></div>
         </dl>
       </div>
@@ -385,7 +422,7 @@ footer a { color: var(--ink-2); }
     <div class="final">
       <div class="art"><svg class="flower"><use href="#flower"/></svg><span class="orbit"></span></div>
       <h2 id="ajak">Mac lapang, kerja tenang.</h2>
-      <a class="btn" href="https://downloads.ourbooth.app/lapangke/Lapangke-1.2.0.dmg"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh Lapangke · 2,3 MB</a>
+      <a class="btn" href="https://downloads.ourbooth.app/lapangke/Lapangke-1.3.0.dmg"><svg aria-hidden="true"><use href="#i-download"/></svg>Unduh Lapangke · 2,8 MB</a>
       <p class="meta">Gratis &amp; open source · Butuh macOS 14 Sonoma atau lebih baru · <a href="https://github.com/thomasalfa12/lapangke">Lihat kode di GitHub</a></p>
     </div>
   </section>

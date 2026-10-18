@@ -69,9 +69,17 @@ final class AppModel {
     var categoryFilter: ItemCategory?
     var search = ""
     var pendingCleanup: [CleanupItem]?
+    /// Panduan izin: tampil otomatis sekali di awal, bisa dibuka lagi dari Pengaturan.
+    var showOnboarding = !UserDefaults.standard.bool(forKey: "onboardingDone")
     var isCleaning = false
-    var cleanProgress = 0.0
-    var cleanCurrent = ""
+    /// Progres terakhir dari Cleaner (nil = belum mulai).
+    var cleanState: CleanupProgress?
+    var cleanStartedAt: Date?
+    var cleanWarnings: [String] = []
+    var stopRequested = false
+    private var stopFlag: StopFlag?
+    /// Ringkasan terakhir untuk Pulau Lapangke & notifikasi.
+    var lastFreedBytes: Int64 = 0
     var outcomes: [CleanupOutcome] = []
 
     // Disk & SSD
@@ -131,6 +139,18 @@ final class AppModel {
         }
     }
 
+    func count(for filter: ItemFilter) -> Int {
+        report?.items.filter(filter.includes).count ?? 0
+    }
+
+    /// Total per kategori untuk filter aktif (mengabaikan pilihan kategori), besar ke kecil.
+    var categoryTotals: [(ItemCategory, Int64)] {
+        let items = report?.items.filter(filter.includes) ?? []
+        return Dictionary(grouping: items, by: \.category)
+            .map { ($0.key, $0.value.reduce(0) { $0 + $1.bytes }) }
+            .sorted { $0.1 > $1.1 }
+    }
+
     var selectedItems: [CleanupItem] {
         report?.items.filter { selection.contains($0.id) && $0.isSelectable } ?? []
     }
@@ -172,23 +192,35 @@ final class AppModel {
         let actionable = items.filter(\.isSelectable)
         guard !actionable.isEmpty else { return }
         outcomes = []
+        cleanState = nil
+        cleanWarnings = []
         pendingCleanup = actionable
+        // pgrep & cek proses berjalan di latar, bukan di setiap render lembar konfirmasi.
+        Task {
+            let warnings = await Task.detached { Cleaner.preflightWarnings(for: actionable) }.value
+            if self.pendingCleanup == actionable { self.cleanWarnings = warnings }
+        }
     }
 
     func performCleanup() async {
         guard let items = pendingCleanup, !isCleaning else { return }
         isCleaning = true
-        cleanProgress = 0
+        stopRequested = false
+        cleanStartedAt = Date()
+        let total = items.reduce(0) { $0 + $1.bytes }
+        cleanState = CleanupProgress(itemIndex: 0, itemCount: items.count, title: items.first?.title ?? "", phase: .deleting,
+                                     itemDone: 0, itemTotal: items.first?.bytes ?? 0, processed: 0, total: total)
+        let flag = StopFlag()
+        stopFlag = flag
         let results = await Task.detached(priority: .userInitiated) {
-            await Cleaner().run(items) { done, total, current in
-                Task { @MainActor in
-                    self.cleanProgress = total == 0 ? 1 : Double(done) / Double(total)
-                    self.cleanCurrent = current
-                }
+            await Cleaner().run(items, stop: flag) { state in
+                Task { @MainActor in self.cleanState = state }
             }
         }.value
         outcomes = await retryAppBundlesWithFinder(results)
         isCleaning = false
+        stopFlag = nil
+        lastFreedBytes = outcomes.reduce(0) { $0 + $1.freedBytes }
         if items.contains(where: { $0.category == .apps }) { Task { await loadApps() } }
         let done = Set(outcomes.filter(\.success).map(\.id))
         report?.items.removeAll { done.contains($0.id) }
@@ -196,7 +228,17 @@ final class AppModel {
         if let report { Self.cacheReport(report) }
         refreshFreeSpace()
         activity = ActivityLog().load()
+        onCleanupFinished?(lastFreedBytes, outcomes.filter { !$0.success }.count)
     }
+
+    /// Berhenti setelah item yang sedang berjalan (item besar tidak dipotong di tengah).
+    func requestStop() {
+        stopRequested = true
+        stopFlag?.set()
+    }
+
+    /// Dipasang oleh layanan notifikasi & Pulau Lapangke.
+    @ObservationIgnored var onCleanupFinished: ((Int64, Int) -> Void)?
 
     /// App dari App Store dimiliki root: FileManager tidak boleh memindahkannya, tetapi Finder boleh
     /// (macOS meminta password admin). Sisa datanya sudah diproses Cleaner.

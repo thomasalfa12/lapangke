@@ -2,8 +2,15 @@ import AppKit
 import LapangkeCore
 import SwiftUI
 
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        MainActor.assumeIsolated { AppServices.shared.start() }
+    }
+}
+
 struct LapangkeApp: App {
-    @State private var model = AppModel()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    @State private var model = AppServices.shared.model
 
     var body: some Scene {
         Window("Lapangke", id: "main") {
@@ -24,8 +31,7 @@ struct LapangkeApp: App {
         MenuBarExtra {
             MenuBarPanel().environment(model).tint(Brand.accent)
         } label: {
-            Image(systemName: model.isLowOnSpace ? "externaldrive.fill.badge.exclamationmark" : "internaldrive")
-            Text(model.freeBytes.bytesText)
+            MenuBarLabel(model: model)
         }
         .menuBarExtraStyle(.window)
 
@@ -37,8 +43,22 @@ struct LapangkeApp: App {
     }
 }
 
+/// Cincin pengukur di menu bar + ruang kosong. Sekaligus menyimpan aksi buka-jendela untuk layanan.
+struct MenuBarLabel: View {
+    let model: AppModel
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        let used = model.totalBytes > 0 ? Double(model.totalBytes - model.freeBytes) / Double(model.totalBytes) : 0
+        Image(nsImage: MenuBarIcon.make(usedFraction: used, low: model.isLowOnSpace))
+        Text(model.freeBytes.bytesText)
+            .task { AppServices.shared.openMainWindow = { openWindow(id: "main") } }
+    }
+}
+
 struct ContentView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         @Bindable var model = model
@@ -75,6 +95,9 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .sheet(isPresented: $model.showOnboarding) {
+            OnboardingView().environment(model).tint(Brand.accent)
+        }
         .sheet(isPresented: Binding(
             get: { model.pendingCleanup != nil },
             set: { if !$0 && !model.isCleaning { model.pendingCleanup = nil } }
@@ -82,6 +105,7 @@ struct ContentView: View {
             ConfirmCleanupSheet().environment(model)
         }
         .task {
+            AppServices.shared.openMainWindow = { openWindow(id: "main") }
             if model.report == nil { await model.scan() }
         }
         #if DEBUG
@@ -160,6 +184,12 @@ struct MenuBarPanel: View {
                 .disabled((model.report?.recommendedBytes ?? 0) == 0)
             }
             HStack {
+                Button {
+                    AppServices.shared.peek()
+                } label: {
+                    Label("Intip Pulau Lapangke", systemImage: "capsule.fill")
+                }
+                .buttonStyle(.borderless).font(.caption)
                 Spacer()
                 Button("Keluar") { NSApp.terminate(nil) }.buttonStyle(.borderless).font(.caption)
             }

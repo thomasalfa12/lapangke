@@ -39,28 +39,42 @@ public struct Cleaner: Sendable {
         return warnings
     }
 
+    /// Menjalankan item satu per satu. `progress` dipanggil saat item berganti dan, untuk penghapusan
+    /// folder, ±10× per detik selama item berjalan. `stop` diperiksa sebelum tiap item dimulai.
     public func run(
         _ items: [CleanupItem],
-        progress: @escaping @Sendable (_ done: Int, _ total: Int, _ current: String) -> Void = { _, _, _ in }
+        stop: StopFlag = StopFlag(),
+        progress: @escaping @Sendable (CleanupProgress) -> Void = { _ in }
     ) async -> [CleanupOutcome] {
         if items.contains(where: { $0.path.contains("/.gradle/") }) {
             Shell.run("/usr/bin/pkill", ["-f", "GradleDaemon"], timeout: 10)
         }
+        let total = items.reduce(0) { $0 + $1.bytes }
+        var processedBefore: Int64 = 0
         var outcomes: [CleanupOutcome] = []
         for (index, item) in items.enumerated() {
-            progress(index, items.count, item.title)
-            let outcome = perform(item)
+            if stop.isSet { break }
+            let base = processedBefore
+            let report: @Sendable (CleanupProgress.Phase, Int64) -> Void = { phase, done in
+                progress(CleanupProgress(
+                    itemIndex: index, itemCount: items.count, title: item.title, phase: phase,
+                    itemDone: min(done, item.bytes), itemTotal: item.bytes,
+                    processed: base + min(done, item.bytes), total: total
+                ))
+            }
+            let outcome = perform(item, report: report)
+            processedBefore += item.bytes
+            report(.finishing, item.bytes)
             outcomes.append(outcome)
             log.append(ActivityEntry(
                 kind: item.action.verb, title: item.title, path: item.path, bytes: outcome.freedBytes,
                 success: outcome.success, message: outcome.message
             ))
         }
-        progress(items.count, items.count, "")
         return outcomes
     }
 
-    func perform(_ item: CleanupItem) -> CleanupOutcome {
+    func perform(_ item: CleanupItem, report: (CleanupProgress.Phase, Int64) -> Void = { _, _ in }) -> CleanupOutcome {
         do {
             try guardrail.validate(item)
         } catch {
@@ -70,33 +84,50 @@ public struct Cleaner: Sendable {
         do {
             switch item.action {
             case .delete:
-                try fm.removeItem(atPath: item.path)
-                let failed = processRelated(item) { try fm.removeItem(atPath: $0) }
+                report(.deleting, 0)
+                var freedMain: Int64 = 0
+                try FastDelete.remove(item.path) { bytes in
+                    freedMain = bytes
+                    report(.deleting, bytes)
+                }
+                let failed = processRelated(item) { path in
+                    try FastDelete.remove(path) { report(.deleting, freedMain + $0) }
+                }
                 return CleanupOutcome(item: item, success: failed.isEmpty, freedBytes: failed.isEmpty ? item.bytes : 0,
                                       message: failed.isEmpty ? "Dihapus" : "Sebagian dilewati: \(failed.joined(separator: ", "))")
             case .trash:
+                report(.trashing, 0)
                 try fm.trashItem(at: URL(fileURLWithPath: item.path), resultingItemURL: nil)
                 let failed = processRelated(item) { try fm.trashItem(at: URL(fileURLWithPath: $0), resultingItemURL: nil) }
                 return CleanupOutcome(item: item, success: failed.isEmpty, freedBytes: 0,
                                       message: failed.isEmpty ? "Dipindah ke Tong Sampah" : "Sebagian dilewati: \(failed.joined(separator: ", "))")
             case .emptyTrash:
                 var failures = 0
+                var freed: Int64 = 0
+                report(.emptyingTrash, 0)
                 for child in PathTools.children(of: URL(fileURLWithPath: item.path)) {
                     do {
                         try guardrail.validate(path: child.path, allowRepository: true)
-                        try fm.removeItem(at: child)
+                        let before = freed
+                        try FastDelete.remove(child.path) { bytes in
+                            freed = before + bytes
+                            report(.emptyingTrash, freed)
+                        }
                     } catch {
                         failures += 1
                     }
                 }
                 let message = failures == 0 ? "Tong Sampah dikosongkan" : "\(failures) item tidak bisa dihapus (butuh Full Disk Access?)"
-                return CleanupOutcome(item: item, success: failures == 0, freedBytes: failures == 0 ? item.bytes : 0, message: message)
+                return CleanupOutcome(item: item, success: failures == 0, freedBytes: failures == 0 ? item.bytes : freed, message: message)
             case let .simulatorErase(udid):
+                report(.resetting, 0)
                 _ = Toolchain.simctl(["shutdown", udid], timeout: 60)
                 return simctl(["erase", udid], item: item, success: "Simulator di-reset")
             case let .simulatorDelete(udid):
+                report(.resetting, 0)
                 return simctl(["delete", udid], item: item, success: "Simulator dihapus")
             case let .simulatorRuntimeDelete(identifier):
+                report(.resetting, 0)
                 return simctl(["runtime", "delete", identifier], item: item, success: "Runtime dihapus", timeout: 600)
             case .manual:
                 return CleanupOutcome(item: item, success: false, freedBytes: 0, message: "Butuh langkah manual")
@@ -130,6 +161,9 @@ public struct Cleaner: Sendable {
     }
 
     static func describe(_ error: Error, path: String) -> String {
+        if let posix = error as? POSIXError, posix.code == .EPERM || posix.code == .EACCES {
+            return "Sebagian file tidak boleh dihapus (izin). Aktifkan Full Disk Access untuk Lapangke, atau tutup app yang memakainya."
+        }
         let nsError = error as NSError
         if nsError.domain == NSCocoaErrorDomain, nsError.code == NSFileWriteNoPermissionError || nsError.code == NSFileReadNoPermissionError {
             return path.hasSuffix(".app")
