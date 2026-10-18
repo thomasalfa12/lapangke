@@ -68,7 +68,12 @@ fi
 git push -q origin HEAD
 echo "Menunggu GitHub Pages menyajikan $file …"
 for _ in $(seq 1 40); do
-  got="$(curl -fsSI "$SITE/$file?v=$(date +%s)" 2>/dev/null | awk 'tolower($1)=="content-length:"{print $2+0}' | tail -1 || true)"
+  # Deploy baru = latest.json live sama persis dengan yang baru di-push, dan DMG-nya utuh.
+  if curl -fs "$SITE/latest.json?v=$(date +%s)" 2>/dev/null | cmp -s - web/public/latest.json; then
+    got="$(curl -fsSI "$SITE/$file?v=$(date +%s)" 2>/dev/null | awk 'tolower($1)=="content-length:"{print $2+0}' | tail -1 || true)"
+  else
+    got=0
+  fi
   if [ "${got:-0}" = "$size" ]; then
     echo "✓ Live: $SITE/ (unduhan $SITE/$file)"
     exit 0
