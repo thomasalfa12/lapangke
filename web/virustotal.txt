@@ -1,0 +1,4 @@
+# SHA-256 DMG yang sudah diunggah ke VirusTotal (satu per baris).
+# publish-web.sh hanya menampilkan tautan hasil pindai bila hash rilis ada di sini,
+# jadi tautan tidak pernah membuka laporan kosong. Unggah lewat virustotal.com (butuh CAPTCHA).
+933a5ee1e610450f83b628b857eab4bcad2a1e11226864987636dd67066a64a3

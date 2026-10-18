@@ -73,7 +73,7 @@ Untuk memeriksa UI tanpa izin Screen Recording: `LAPANGKE_SNAPSHOT_LIGHT=1 LAPAN
 
 ## Rilis (maintainer)
 
-Situs: **https://thomasalfa12.github.io/lapangke** (GitHub Pages, sumber `web/`, di-deploy `.github/workflows/pages.yml`). File: DMG di [GitHub Releases](https://github.com/thomasalfa12/lapangke/releases); workflow Pages juga menyalin DMG itu ke situs (dicek SHA-256) supaya tombol unduh memakai host yang sama dengan halaman, dengan GitHub Releases sebagai cadangan. Lapangke berdiri sendiri: tidak memakai domain, bucket, atau layanan proyek lain.
+Situs: **https://thomasalfa12.github.io/lapangke** (GitHub Pages, sumber `web/`, di-deploy `.github/workflows/pages.yml`). File: DMG di [GitHub Releases](https://github.com/thomasalfa12/lapangke/releases); workflow Pages juga menyalin DMG itu ke situs (dicek SHA-256) supaya tombol unduh memakai host yang sama dengan halaman, dengan GitHub Releases sebagai cadangan. Setelah rilis, unggah DMG ke [VirusTotal](https://www.virustotal.com) (lewat web, ada CAPTCHA) lalu tambahkan SHA-256-nya ke `web/virustotal.txt`; tautan hasil pindai baru muncul di situs setelah itu. Lapangke berdiri sendiri: tidak memakai domain, bucket, atau layanan proyek lain.
 
 ```bash
 # naikkan CFBundleShortVersionString + CFBundleVersion di Resources/Info.plist dulu

@@ -27,6 +27,11 @@ values = {
     "SHA256": m["sha256"],
     "DATE": f"{released.day} {months[released.month - 1]} {released.year}",
 }
+# Tautan VirusTotal hanya bila hash rilis ini sudah dipindai (web/virustotal.txt).
+scanned = {line.strip().lower() for line in open("web/virustotal.txt") if line.strip() and not line.startswith("#")}
+vt = f"https://www.virustotal.com/gui/file/{m['sha256']}/detection"
+values["VT_CHIP"] = f'\n          <a class="trust-chip" href="{vt}"><i class="vt"><svg aria-hidden="true"><use href="#i-shield"/></svg></i>Dipindai VirusTotal</a>' if m["sha256"].lower() in scanned else ""
+values["VT_FACT"] = f'\n        <a class="fact-link" href="{vt}">Hasil pindai VirusTotal →</a>' if m["sha256"].lower() in scanned else ""
 for template, output in [("web/index.template.html", "web/public/index.html"), ("web/404.template.html", "web/public/404.html")]:
     html = open(template).read()
     for key, value in values.items():
@@ -44,6 +49,8 @@ public = {
     "url": f"{site}/{file}",
     "mirrors": [m["url"]],
 }
+if m["sha256"].lower() in scanned:
+    public["virustotal"] = vt
 with open("web/public/latest.json", "w") as f:
     json.dump(public, f, indent=2)
     f.write("\n")
