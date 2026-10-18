@@ -61,7 +61,7 @@ fi
 git push -q origin HEAD
 echo "Menunggu GitHub Pages menyajikan $file …"
 for _ in $(seq 1 40); do
-  got="$(curl -fsSI "$SITE/$file?v=$(date +%s)" 2>/dev/null | awk 'tolower($1)=="content-length:"{print $2+0}' | tail -1)"
+  got="$(curl -fsSI "$SITE/$file?v=$(date +%s)" 2>/dev/null | awk 'tolower($1)=="content-length:"{print $2+0}' | tail -1 || true)"
   if [ "${got:-0}" = "$size" ]; then
     echo "✓ Live: $SITE/ (unduhan $SITE/$file)"
     exit 0
