@@ -3,7 +3,7 @@
 <h1 align="center">Lapangke</h1>
 
 <p align="center"><b>Bikin storage Mac lapang lagi, tanpa takut salah hapus.</b><br>
-<a href="https://lapangke.ourbooth.app">Unduh</a> · macOS 14 Sonoma atau lebih baru · Apple Silicon &amp; Intel · Gratis &amp; open source (MIT)</p>
+<a href="https://thomasalfa12.github.io/lapangke">Unduh</a> · macOS 14 Sonoma atau lebih baru · Apple Silicon &amp; Intel · Gratis &amp; open source (MIT)</p>
 
 > **English:** Lapangke is a free, open-source macOS storage cleaner (SwiftUI, no dependencies). It explains what is safe to delete (caches, rarely used apps with their leftovers, forgotten large files) versus what matters, and adds extra smarts for iOS & Android developers (Xcode DerivedData, simulators, unused Gradle/NDK versions, git-ignored build artifacts). Releases are signed with Developer ID and notarized by Apple. The UI and docs are in Indonesian.
 
@@ -11,7 +11,7 @@ Lapangke adalah pembersih storage macOS untuk semua pengguna Mac, dengan kecerda
 
 ## Unduh
 
-Versi terbaru ada di **[lapangke.ourbooth.app](https://lapangke.ourbooth.app)** atau di halaman [Releases](https://github.com/thomasalfa12/lapangke/releases). DMG ditandatangani Developer ID dan dinotarisasi Apple, jadi macOS membukanya tanpa peringatan.
+Versi terbaru ada di **[thomasalfa12.github.io/lapangke](https://thomasalfa12.github.io/lapangke)** atau di halaman [Releases](https://github.com/thomasalfa12/lapangke/releases). DMG ditandatangani Developer ID dan dinotarisasi Apple, jadi macOS membukanya tanpa peringatan.
 
 Setelah dipasang: System Settings › Privacy & Security › **Full Disk Access** › tambahkan Lapangke. Tanpa izin ini, Tong Sampah, Containers, dan media WhatsApp/Telegram tidak terlihat.
 
@@ -73,16 +73,16 @@ Untuk memeriksa UI tanpa izin Screen Recording: `LAPANGKE_SNAPSHOT_LIGHT=1 LAPAN
 
 ## Rilis (maintainer)
 
-Situs: **https://lapangke.ourbooth.app** (Cloudflare Workers static assets, sumber `web/`). File: `<LAPANGKE_PUBLIC_BASE>/lapangke/Lapangke-<versi>.dmg` di R2. Situs & file sengaja memakai domain sendiri: `r2.dev`, `workers.dev`, dan banyak `pages.dev` diblokir sebagian ISP Indonesia.
+Situs: **https://thomasalfa12.github.io/lapangke** (GitHub Pages, sumber `web/`, di-deploy `.github/workflows/pages.yml`). File: DMG di [GitHub Releases](https://github.com/thomasalfa12/lapangke/releases). Lapangke berdiri sendiri: tidak memakai domain, bucket, atau layanan proyek lain.
 
 ```bash
 # naikkan CFBundleShortVersionString + CFBundleVersion di Resources/Info.plist dulu
-scripts/release.sh --upload      # Developer ID lewat Xcode → notarisasi Apple → DMG → cek Gatekeeper → R2 → website
-scripts/release.sh --upload-only # unggah DMG yang sudah ada di build/release tanpa notarisasi ulang
-scripts/publish-web.sh           # hanya render + deploy website dari build/release/latest.json
+scripts/release.sh --publish       # Developer ID lewat Xcode → notarisasi Apple → DMG → cek Gatekeeper → rilis GitHub → situs
+scripts/release.sh --publish-only  # terbitkan DMG yang sudah ada di build/release tanpa notarisasi ulang
+scripts/publish-web.sh --push      # hanya render + push situs dari build/release/latest.json
 ```
 
-Syarat: Xcode › Settings › Accounts login sebagai Account Holder tim Apple Developer. Konfigurasi lewat env: `LAPANGKE_TEAM_ID`, `LAPANGKE_R2_BUCKET`, `LAPANGKE_PUBLIC_BASE`, `LAPANGKE_SITE` (bawaannya infrastruktur rilis resmi). Notarisasi biasanya 5–10 menit.
+Syarat: Xcode › Settings › Accounts login sebagai Account Holder tim Apple Developer, dan `gh` sudah login. Env: `LAPANGKE_TEAM_ID`, `LAPANGKE_REPO`, `LAPANGKE_SITE` (isi dengan domain sendiri saat dipasang). Notarisasi biasanya 5–10 menit.
 
 ## Terminal (read-only)
 

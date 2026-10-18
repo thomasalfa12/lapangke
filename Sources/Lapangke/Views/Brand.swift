@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Palet & bentuk yang sama dengan lapangke.ourbooth.app (turunan ourbooth.app), dengan varian gelap.
+/// Palet & bentuk Lapangke (sama dengan situsnya), dengan varian gelap.
 enum Brand {
     static let ink = dynamic(light: 0x082E52, dark: 0xEAF3FF)
     static let ink2 = dynamic(light: 0x405B73, dark: 0xB3C6D8)
@@ -39,7 +39,7 @@ extension Color {
     init(hex: UInt32) { self.init(nsColor: NSColor(hex: hex)) }
 }
 
-/// Bentuk "flower" ourbooth (viewBox 120×120).
+/// Bentuk "flower" Lapangke (viewBox 120×120).
 struct FlowerShape: Shape {
     func path(in rect: CGRect) -> Path {
         let segments: [(CGFloat, CGFloat, CGFloat, CGFloat, CGFloat, CGFloat)] = [
@@ -58,7 +58,7 @@ struct FlowerShape: Shape {
     }
 }
 
-/// Bintang empat sudut ("spark") ourbooth (viewBox 80×80).
+/// Bintang empat sudut ("spark") Lapangke (viewBox 80×80).
 struct SparkShape: Shape {
     func path(in rect: CGRect) -> Path {
         func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
@@ -109,7 +109,7 @@ struct PillButtonStyle: ButtonStyle {
     }
 }
 
-/// Stiker squircle bersudut tajam satu (seperti ikon kamera di hero ourbooth.app).
+/// Stiker squircle bersudut tajam satu.
 struct Sticker: View {
     let symbol: String
     var background: Color = Brand.accent

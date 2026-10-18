@@ -2,6 +2,8 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lapangke — bikin Mac lapang lagi</title>
 <meta name="description" content="Lapangke menunjukkan mana yang aman dihapus di Mac Anda: cache, app yang jarang dibuka, file besar yang terlupa. Ditandatangani & dinotarisasi Apple.">
@@ -9,16 +11,16 @@
 <meta name="theme-color" content="#f4f9ff">
 <meta property="og:title" content="Lapangke — bikin Mac lapang lagi">
 <meta property="og:description" content="Bersihkan storage Mac tanpa takut salah hapus. Gratis, ditandatangani & dinotarisasi Apple.">
-<meta property="og:image" content="https://lapangke.ourbooth.app/og.png">
-<meta property="og:url" content="https://lapangke.ourbooth.app/">
+<meta property="og:image" content="{{SITE}}/og.png">
+<meta property="og:url" content="{{SITE}}/">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preload" href="/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preload" href="fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 @font-face {
   font-family: "Outfit";
-  src: url("/fonts/outfit-latin.woff2") format("woff2");
+  src: url("fonts/outfit-latin.woff2") format("woff2");
   font-weight: 400 800;
   font-display: swap;
 }
@@ -39,7 +41,7 @@ img { display: block; max-width: 100%; }
 svg { flex: none; }
 .container { width: min(1180px, 100% - 48px); margin-inline: auto; }
 
-/* Bentuk ekspresif (sama dengan ourbooth.app) */
+/* Bentuk ekspresif */
 .art { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; }
 .art > * { position: absolute; }
 .flower { width: 44%; right: -8%; top: -12%; color: var(--flower); transform: rotate(12deg); }
@@ -264,7 +266,7 @@ footer a { color: var(--ink-2); }
 
 <header class="nav">
   <div class="container">
-    <a class="brand" href="/"><img src="/icon.png" alt="" width="36" height="36">Lapangke</a>
+    <a class="brand" href="./"><img src="icon.png" alt="" width="36" height="36">Lapangke</a>
     <nav class="nav-links" aria-label="Utama">
       <a href="#fitur">Fitur</a>
       <a href="#aman">Kenapa aman</a>
@@ -299,7 +301,7 @@ footer a { color: var(--ink-2); }
         </div>
         <figure class="window">
           <div class="window-bar"><i></i><i></i><i></i></div>
-          <img src="/screen-overview.jpg" alt="" width="1600" height="927" fetchpriority="high">
+          <img src="screen-overview.jpg" alt="" width="1600" height="927" fetchpriority="high">
         </figure>
         <span class="sticker sticker-a"><svg><use href="#i-sparkles"/></svg></span>
         <span class="sticker sticker-b"><svg><use href="#i-check"/></svg></span>
@@ -431,7 +433,7 @@ footer a { color: var(--ink-2); }
 <footer>
   <div class="container">
     <span>© 2026 Lapangke · <a href="https://github.com/thomasalfa12/lapangke/blob/main/LICENSE">Lisensi MIT</a> · <a href="https://github.com/thomasalfa12/lapangke">GitHub</a></span>
-    <span>Dibuat untuk Mac yang selalu penuh · <a href="https://ourbooth.app">OurBooth</a></span>
+    <span>Dibuat untuk Mac yang selalu penuh.</span>
   </div>
 </footer>
 </body>

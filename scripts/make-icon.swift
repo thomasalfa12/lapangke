@@ -1,4 +1,4 @@
-// Membuat Resources/AppIcon.icns + PNG untuk website dari bentuk yang sama dengan ourbooth.app
+// Membuat Resources/AppIcon.icns + PNG untuk website dari palet & bentuk Lapangke
 // (gradien biru Original, flower & spark ekspresif). Jalankan dari root proyek: swift scripts/make-icon.swift "$PWD"
 import AppKit
 

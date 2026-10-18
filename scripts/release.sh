@@ -1,26 +1,23 @@
 #!/usr/bin/env bash
 # Rilis publik Lapangke: tanda tangan Developer ID lewat Xcode, notarisasi Apple, DMG, cek Gatekeeper.
-#   scripts/release.sh            → build/release/Lapangke-<versi>.dmg + latest.json
-#   scripts/release.sh --upload        → juga unggah ke R2 (downloads.ourbooth.app/lapangke/…) + deploy website
-#   scripts/release.sh --upload-only   → unggah DMG yang sudah ada di build/release (tanpa notarisasi ulang)
+#   scripts/release.sh                → build/release/Lapangke-<versi>.dmg + latest.json
+#   scripts/release.sh --publish      → juga rilis GitHub (DMG) + perbarui situs (GitHub Pages)
+#   scripts/release.sh --publish-only → terbitkan DMG yang sudah ada di build/release (tanpa notarisasi ulang)
 #
 # Tanpa sertifikat Developer ID di keychain: tim dengan sertifikat cloud-managed bisa dipakai, karena
 # .app dibungkus .xcarchive lalu diekspor `xcodebuild -exportArchive` (method developer-id,
 # destination upload = langsung ke notary Apple) dan diambil kembali dengan `-exportNotarizedApp`.
-# Syarat: Xcode › Settings › Accounts login sebagai Account Holder tim (LAPANGKE_TEAM_ID).
+# Syarat: Xcode › Settings › Accounts login sebagai Account Holder tim (LAPANGKE_TEAM_ID); `gh` login.
 #
-# Variabel (bawaan = infrastruktur rilis resmi lapangke.ourbooth.app):
-#   LAPANGKE_TEAM_ID      Team ID Apple Developer
-#   LAPANGKE_R2_BUCKET    bucket R2 tujuan unggah
-#   LAPANGKE_PUBLIC_BASE  URL publik bucket (tanpa prefix)
+# Variabel:
+#   LAPANGKE_TEAM_ID   Team ID Apple Developer
+#   LAPANGKE_REPO      repo GitHub tempat rilis (bawaan thomasalfa12/lapangke)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
 
 TEAM="${LAPANGKE_TEAM_ID:-4KSYSZU72C}"
-BUCKET="${LAPANGKE_R2_BUCKET:-ourbooth-printer-studio}"
-PREFIX="lapangke"
-PUBLIC="${LAPANGKE_PUBLIC_BASE:-https://downloads.ourbooth.app}/$PREFIX"
+REPO="${LAPANGKE_REPO:-thomasalfa12/lapangke}"
 APP_NAME="Lapangke.app"
 VERSION="$(plutil -extract CFBundleShortVersionString raw Resources/Info.plist)"
 BUNDLE_ID="$(plutil -extract CFBundleIdentifier raw Resources/Info.plist)"
@@ -39,22 +36,25 @@ say() { printf '\033[1m==>\033[0m %s\n' "$*"; }
 fail() { printf '\033[31mgagal:\033[0m %s\n' "$*" >&2; exit 1; }
 gatekeeper() { spctl -a -vv -t exec "$1" 2>&1 | grep -E 'accepted|rejected|source=' | tr '\n' ' '; }
 
-upload() {
-  say "Unggah ke R2 ($BUCKET/$PREFIX)"
-  npx --yes wrangler@4 r2 object put "$BUCKET/$PREFIX/$DMG" --remote --file "$OUT/$DMG" \
-    --content-type application/x-apple-diskimage \
-    --content-disposition "attachment; filename=\"$DMG\"" \
-    --cache-control "public, max-age=31536000, immutable"
-  npx --yes wrangler@4 r2 object put "$BUCKET/$PREFIX/latest.json" --remote --file "$OUT/latest.json" \
-    --content-type application/json --cache-control "public, max-age=300"
-  curl -fsSI "$PUBLIC/$DMG" | grep -iE '^(HTTP|content-length|content-type)' || fail "$PUBLIC/$DMG belum bisa diunduh"
-  say "Perbarui & deploy website"
-  scripts/publish-web.sh
+publish() {
+  say "Rilis GitHub v$VERSION ($REPO)"
+  git push -q origin HEAD
+  if gh release view "v$VERSION" --repo "$REPO" >/dev/null 2>&1; then
+    gh release upload "v$VERSION" "$OUT/$DMG" --repo "$REPO" --clobber
+  else
+    minimum="$(plutil -extract LSMinimumSystemVersion raw Resources/Info.plist)"
+    checksum="$(shasum -a 256 "$OUT/$DMG" | awk '{print $1}')"
+    gh release create "v$VERSION" "$OUT/$DMG" --repo "$REPO" --target "$(git rev-parse HEAD)" --title "Lapangke $VERSION" \
+      --notes "Unduh $DMG di bawah. Butuh macOS $minimum atau lebih baru. Ditandatangani Developer ID & dinotarisasi Apple. SHA-256: $checksum"
+  fi
+  curl -fsSIL "$(plutil -extract url raw "$OUT/latest.json")" | grep -iE '^HTTP/[0-9.]+ 200' >/dev/null || fail "DMG di GitHub belum bisa diunduh"
+  say "Perbarui situs"
+  scripts/publish-web.sh --push
 }
 
-if [ "${1:-}" = "--upload-only" ]; then
+if [ "${1:-}" = "--publish-only" ]; then
   [ -f "$OUT/$DMG" ] || fail "$OUT/$DMG belum ada; jalankan scripts/release.sh dulu"
-  upload
+  publish
   exit 0
 fi
 
@@ -155,11 +155,11 @@ cat > "$OUT/latest.json" <<JSON
   "version": "$VERSION",
   "releasedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "minimumMacOS": "$(plutil -extract LSMinimumSystemVersion raw Resources/Info.plist)",
-  "url": "$PUBLIC/$DMG",
+  "url": "https://github.com/$REPO/releases/download/v$VERSION/$DMG",
   "sizeBytes": $size,
   "sha256": "$sha"
 }
 JSON
 say "Siap: $OUT/$DMG ($size byte, sha256 $sha)"
 
-if [ "${1:-}" = "--upload" ]; then upload; fi
+if [ "${1:-}" = "--publish" ]; then publish; fi
